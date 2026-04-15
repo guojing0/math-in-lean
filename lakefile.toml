@@ -1,0 +1,17 @@
+name = "math-in-lean"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["MathInLean"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "mathlib"
+path = "/Users/guoj/github/cam-combi/.lake/packages/mathlib"
+
+[[lean_lib]]
+name = "MathInLean"
