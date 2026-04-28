@@ -44,7 +44,9 @@ example (x : ℝ) : x ≤ x :=
 
 -- Try this.
 example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d) (h₃ : d < e) : a < e := by
-  sorry
+  have h₄ : a < c := lt_of_le_of_lt h₀ h₁
+  have h₅ : c < e := lt_of_le_of_lt h₂ h₃
+  exact lt_trans h₄ h₅
 
 example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d) (h₃ : d < e) : a < e := by
   linarith
@@ -64,12 +66,12 @@ example (h : 1 ≤ a) (h' : b ≤ c) : 2 + a + exp b ≤ 3 * a + exp c := by
 #check (log_le_log : 0 < a → a ≤ b → log a ≤ log b)
 #check (log_lt_log : 0 < a → a < b → log a < log b)
 #check (add_le_add : a ≤ b → c ≤ d → a + c ≤ b + d)
-#check (add_le_add_left : a ≤ b → ∀ c, c + a ≤ c + b)
-#check (add_le_add_right : a ≤ b → ∀ c, a + c ≤ b + c)
+#check (add_le_add_left : a ≤ b → ∀ c, a + c ≤ b + c)
+#check (add_le_add_right : a ≤ b → ∀ c, c + a ≤ c + b)
 #check (add_lt_add_of_le_of_lt : a ≤ b → c < d → a + c < b + d)
 #check (add_lt_add_of_lt_of_le : a < b → c ≤ d → a + c < b + d)
-#check (add_lt_add_left : a < b → ∀ c, c + a < c + b)
-#check (add_lt_add_right : a < b → ∀ c, a + c < b + c)
+#check (add_lt_add_left : a < b → ∀ c, a + c < b + c)
+#check (add_lt_add_right : a < b → ∀ c, c + a < c + b)
 #check (add_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a + b)
 #check (add_pos : 0 < a → 0 < b → 0 < a + b)
 #check (add_pos_of_pos_of_nonneg : 0 < a → 0 ≤ b → 0 < a + b)
@@ -86,21 +88,29 @@ example (h₀ : a ≤ b) (h₁ : c < d) : a + exp c + e < b + exp d + e := by
     apply exp_lt_exp.mpr h₁
   apply le_refl
 
-example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) := by sorry
+example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) := by
+  apply add_le_add_right
+  apply exp_le_exp.mpr
+  linarith
 
 example : (0 : ℝ) < 1 := by norm_num
 
 example (h : a ≤ b) : log (1 + exp a) ≤ log (1 + exp b) := by
-  have h₀ : 0 < 1 + exp a := by sorry
+  have h₀ : 0 < 1 + exp a := by
+    have h₁ : (0 : ℝ) < 1 := by norm_num
+    have h₂ : (0 : ℝ) < exp a := by apply exp_pos
+    exact add_pos h₁ h₂
   apply log_le_log h₀
-  sorry
+  apply add_le_add_right
+  linarith [exp_le_exp.mpr h]
 
 example : 0 ≤ a ^ 2 := by
-  -- apply?
   exact sq_nonneg a
+  -- exact sq_nonneg a
 
 example (h : a ≤ b) : c - exp b ≤ c - exp a := by
-  sorry
+  refine tsub_le_tsub_left ?_ c
+  linarith [exp_le_exp.mpr h]
 
 example : 2*a*b ≤ a^2 + b^2 := by
   have h : 0 ≤ a^2 - 2*a*b + b^2
