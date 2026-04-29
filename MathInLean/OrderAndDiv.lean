@@ -1,8 +1,6 @@
 import MathInLean.Common
 import Mathlib.Data.Real.Basic
 
-namespace C02S04
-
 section
 variable (a b c d : ℝ)
 
@@ -38,12 +36,36 @@ example : min a b = min b a := by
     apply min_le_right
     apply min_le_left
 
+#check le_max_left
+
 example : max a b = max b a := by
-  sorry
+  have h : ∀ x y : ℝ, max x y ≤ max y x := by
+    intro x y
+    apply max_le
+    apply le_max_right
+    apply le_max_left
+  apply le_antisymm
+  apply h
+  apply h
+
+example : max a b = max b a := by
+  apply le_antisymm
+  repeat
+    apply max_le
+    apply le_max_right
+    apply le_max_left
+
 example : min (min a b) c = min a (min b c) := by
-  sorry
+  exact min_assoc a b c
+
 theorem aux : min a b + c ≤ min (a + c) (b + c) := by
-  sorry
+  apply le_min
+  apply add_le_add_left
+  apply min_le_left
+  apply add_le_add_left
+  apply min_le_right
+  -- exact le_min (add_le_add_left (min_le_left a b) c) (add_le_add_left (min_le_right a b) c)
+
 example : min a b + c = min (a + c) (b + c) := by
   sorry
 #check (abs_add : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
