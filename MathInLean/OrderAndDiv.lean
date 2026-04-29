@@ -66,13 +66,43 @@ theorem aux : min a b + c ≤ min (a + c) (b + c) := by
   apply min_le_right
   -- exact le_min (add_le_add_left (min_le_left a b) c) (add_le_add_left (min_le_right a b) c)
 
+#check add_neg_cancel_right
+
 example : min a b + c = min (a + c) (b + c) := by
-  sorry
-#check (abs_add : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
+  apply le_antisymm
+  · apply aux a b c
+  · have h := aux (a + c) (b + c) (-c)
+    rw [add_neg_cancel_right, add_neg_cancel_right] at h
+    linarith
+
+#check add_sub_cancel_right
+#check sub_add_cancel
+
+#check (abs_add_le : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
+
+example : |a| - |b| ≤ |a - b| := by
+  have h : |a| ≤ |b| + |a - b| := by
+    calc
+      |a| = |b + (a - b)| := by
+        rw [← add_sub_assoc]
+        apply abs_eq_abs.mpr
+        constructor
+        exact Eq.symm (add_sub_cancel_left b a)
+      _ ≤ |b| + |a - b| := abs_add_le b (a - b)
+  linarith
 
 example : |a| - |b| ≤ |a - b| :=
-  sorry
-end
+  calc
+    |a| - |b| = |a - b + b| - |b| := by rw [sub_add_cancel]
+    _ ≤ |a - b| + |b| - |b| := by
+      apply sub_le_sub_right
+      apply abs_add_le
+    _ ≤ |a - b| := by rw [add_sub_cancel_right]
+
+example : |a| - |b| ≤ |a - b| := by
+  have h := abs_add_le (a - b) b
+  rw [sub_add_cancel] at h
+  linarith
 
 section
 variable (w x y z : ℕ)
@@ -88,7 +118,12 @@ example : x ∣ x ^ 2 := by
   apply dvd_mul_left
 
 example (h : x ∣ w) : x ∣ y * (x * z) + x ^ 2 + w ^ 2 := by
-  sorry
+  repeat apply dvd_add
+  · rw [mul_comm x z, ← mul_assoc]
+    apply dvd_mul_left
+  · apply dvd_mul_left
+  · rw [pow_two]
+    apply dvd_mul_of_dvd_left h
 end
 
 section
@@ -100,5 +135,11 @@ variable (m n : ℕ)
 #check (Nat.lcm_zero_left n : Nat.lcm 0 n = 0)
 
 example : Nat.gcd m n = Nat.gcd n m := by
-  sorry
+  apply dvd_antisymm
+  repeat
+    apply dvd_gcd
+    apply gcd_dvd_right
+    apply gcd_dvd_left
+end
+
 end
