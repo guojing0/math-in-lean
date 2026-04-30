@@ -81,19 +81,30 @@ section
 variable {R : Type*} [Ring R] [PartialOrder R] [IsStrictOrderedRing R]
 variable (a b c : R)
 
-#check (add_le_add_left : a ≤ b → ∀ c, c + a ≤ c + b)
+#check (add_le_add_left : b ≤ c → ∀ a, b + a ≤ c + a)
 #check (mul_pos : 0 < a → 0 < b → 0 < a * b)
 
 #check (mul_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a * b)
 
-example (h : a ≤ b) : 0 ≤ b - a := by
-  sorry
+theorem aux1 (h : a ≤ b) : 0 ≤ b - a := by
+  calc
+    0 = a + -a := by rw [add_neg_cancel]
+    _ <= b + -a := add_le_add_left h (-a)
+    _ = b - a := by rw [sub_eq_add_neg]
 
-example (h: 0 ≤ b - a) : a ≤ b := by
-  sorry
+theorem aux2 (h : 0 ≤ b - a) : a ≤ b := by
+  rw [← add_zero a]
+  rw [← sub_add_cancel b a]
+  rw [add_comm]
+  apply add_le_add_left h
 
 example (h : a ≤ b) (h' : 0 ≤ c) : a * c ≤ b * c := by
-  sorry
+  apply aux2
+  rw [← sub_mul]
+  apply mul_nonneg
+  · apply aux1
+    exact h
+  · exact h'
 
 end
 
@@ -105,7 +116,12 @@ variable (x y z : X)
 #check (dist_comm x y : dist x y = dist y x)
 #check (dist_triangle x y z : dist x z ≤ dist x y + dist y z)
 
+#check nonneg_of_mul_nonneg_left
+
 example (x y : X) : 0 ≤ dist x y := by
-  sorry
+  have h : dist x x ≤ dist x y + dist y x := dist_triangle x y x
+  rw [dist_comm y x] at h
+  rw [dist_self] at h
+  linarith
 
 end
