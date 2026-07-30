@@ -11,7 +11,9 @@ maxSynthPendingDepth = 3
 
 [[require]]
 name = "mathlib"
-path = "/Users/guoj/github/cam-combi/.lake/packages/mathlib"
+scope = "leanprover-community"
+rev = "v4.32.2"
 
 [[lean_lib]]
 name = "MathInLean"
+globs = ["MathInLean.+"]
